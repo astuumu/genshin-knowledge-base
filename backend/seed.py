@@ -120,12 +120,18 @@ CHARACTERS_DATA = [
 ]
 
 def populate_database():
-    Base.metadata.drop_all(bind=engine)
+
     Base.metadata.create_all(bind=engine)
 
     db = SessionLocal()
 
     try:
+        # Перевірка: якщо персонажі вже є в базі, нічого не перезаписуємо
+        existing_count = db.query(Character).count()
+        if existing_count > 0:
+            print(f"Database already populated ({existing_count} characters found). Skipping seeding.")
+            return
+
         characters_map = {}
         for char_info in CHARACTERS_DATA:
             char_obj = Character(**char_info)
